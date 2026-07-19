@@ -1,4 +1,4 @@
-<title>Chekin Exit — Calculadora</title>
+<title>Exit Calculator</title>
 <style>
   :root, .viz-root {
     --surface-1:      #fcfcfb;
@@ -238,7 +238,7 @@
 <div class="viz-root">
   <div class="wrap">
     <div class="hero">
-      <h1>Chekin Exit</h1>
+      <h1>Exit Calculator</h1>
       <p>Calcula la valoración de exit y qué dinero neto tendrías disponible al mes y al año.</p>
     </div>
 
@@ -465,6 +465,7 @@
             <div class="field">
               <div class="field-label"><span>Multiple ARR</span><span class="field-value" id="st1_multipleVal">7.0×</span></div>
               <input type="range" id="st1_multiple" min="2" max="15" step="0.5" value="7">
+              <div class="field-hint">Se aplica igual en las 3 etapas.</div>
             </div>
             <div class="field">
               <div class="field-label"><span>Equity vendido</span><span class="field-value" id="st1_equityPctVal">25%</span></div>
@@ -484,10 +485,6 @@
                 <input type="text" id="st2_mrr" inputmode="numeric" value="800">
                 <span class="suffix">×1.000 €</span>
               </div>
-            </div>
-            <div class="field">
-              <div class="field-label"><span>Multiple ARR</span><span class="field-value" id="st2_multipleVal">7.0×</span></div>
-              <input type="range" id="st2_multiple" min="2" max="15" step="0.5" value="7">
             </div>
             <div class="field">
               <div class="field-label"><span>Equity vendido</span><span class="field-value" id="st2_equityPctVal">6%</span></div>
@@ -528,10 +525,6 @@
                 <input type="text" id="st3_mrr" inputmode="numeric" value="1000">
                 <span class="suffix">×1.000 €</span>
               </div>
-            </div>
-            <div class="field">
-              <div class="field-label"><span>Multiple ARR</span><span class="field-value" id="st3_multipleVal">7.0×</span></div>
-              <input type="range" id="st3_multiple" min="2" max="15" step="0.5" value="7">
             </div>
             <div class="field">
               <div class="field-label"><span>Equity vendido</span><span class="field-value" id="st3_equityPctVal">6%</span></div>
@@ -903,10 +896,10 @@
   // ======================================================================
   const stInputs = {
     st1_mrr: $('st1_mrr'), st1_multiple: $('st1_multiple'), st1_equityPct: $('st1_equityPct'),
-    st2_mrr: $('st2_mrr'), st2_multiple: $('st2_multiple'), st2_equityPct: $('st2_equityPct'),
+    st2_mrr: $('st2_mrr'), st2_equityPct: $('st2_equityPct'),
     st2_phantomPct: $('st2_phantomPct'), st2_phantomTax: $('st2_phantomTax'),
     earnoutTotalM: $('earnoutTotalM'), st2_earnoutPct: $('st2_earnoutPct'),
-    st3_mrr: $('st3_mrr'), st3_multiple: $('st3_multiple'), st3_equityPct: $('st3_equityPct'),
+    st3_mrr: $('st3_mrr'), st3_equityPct: $('st3_equityPct'),
     st3_phantomPct: $('st3_phantomPct'), st3_phantomTax: $('st3_phantomTax'),
     st3_earnoutPct: $('st3_earnoutPct')
   };
@@ -984,7 +977,6 @@
     const eq1Pct = parseFloat(stInputs.st1_equityPct.value);
 
     const mrr2 = parseThousands(stInputs.st2_mrr.value);
-    const mult2 = parseFloat(stInputs.st2_multiple.value);
     const eq2Pct = parseFloat(stInputs.st2_equityPct.value);
     const ph2Pct = parseFloat(stInputs.st2_phantomPct.value);
     const ph2Tax = parseFloat(stInputs.st2_phantomTax.value);
@@ -993,7 +985,6 @@
     const eo2Pct = parseFloat(stInputs.st2_earnoutPct.value);
 
     const mrr3 = parseThousands(stInputs.st3_mrr.value);
-    const mult3 = parseFloat(stInputs.st3_multiple.value);
     const eq3Pct = parseFloat(stInputs.st3_equityPct.value);
     const ph3Pct = parseFloat(stInputs.st3_phantomPct.value);
     const ph3Tax = parseFloat(stInputs.st3_phantomTax.value);
@@ -1004,7 +995,6 @@
     $('st1_equityPctVal').textContent = eq1Pct + '%';
 
     $('st2_mrrDisplay').textContent = fmtMoney(mrr2,1);
-    $('st2_multipleVal').textContent = mult2.toFixed(1) + '×';
     $('st2_equityPctVal').textContent = eq2Pct + '%';
     $('st2_phantomPctVal').textContent = ph2Pct + '%';
     $('st2_phantomTaxVal').textContent = ph2Tax + '%';
@@ -1012,7 +1002,6 @@
     $('st2_earnoutPctVal').textContent = eo2Pct + '%';
 
     $('st3_mrrDisplay').textContent = fmtMoney(mrr3,1);
-    $('st3_multipleVal').textContent = mult3.toFixed(1) + '×';
     $('st3_equityPctVal').textContent = eq3Pct + '%';
     $('st3_phantomPctVal').textContent = ph3Pct + '%';
     $('st3_phantomTaxVal').textContent = ph3Tax + '%';
@@ -1024,8 +1013,8 @@
     splitEl.style.color = Math.abs(split-100) < 0.01 ? 'var(--good)' : 'var(--warning)';
 
     const r1 = calcStage(mrr1, mult1, eq1Pct, EQUITY_TAX_FIXED, 0, 0, 0, 0, 0);
-    const r2 = calcStage(mrr2, mult2, eq2Pct, EQUITY_TAX_FIXED, ph2Pct, ph2Tax, earnoutTotalM, eo2Pct, EARNOUT_TAX_FIXED);
-    const r3 = calcStage(mrr3, mult3, eq3Pct, EQUITY_TAX_FIXED, ph3Pct, ph3Tax, earnoutTotalM, eo3Pct, EARNOUT_TAX_FIXED);
+    const r2 = calcStage(mrr2, mult1, eq2Pct, EQUITY_TAX_FIXED, ph2Pct, ph2Tax, earnoutTotalM, eo2Pct, EARNOUT_TAX_FIXED);
+    const r3 = calcStage(mrr3, mult1, eq3Pct, EQUITY_TAX_FIXED, ph3Pct, ph3Tax, earnoutTotalM, eo3Pct, EARNOUT_TAX_FIXED);
 
     const grand = r1.total + r2.total + r3.total;
     $('stagedGrandTotal').textContent = fmtMoney(grand,2);
