@@ -1,0 +1,1089 @@
+<title>Chekin Exit — Calculadora</title>
+<style>
+  :root, .viz-root {
+    --surface-1:      #fcfcfb;
+    --page:           #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --grid:           #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --series-1-soft:  rgba(42,120,214,0.14);
+    --good:           #0ca30c;
+    --warning:        #b8790f;
+    --warning-bg:     #fab21922;
+    --critical:       #d03b3b;
+    --critical-bg:    #d03b3b1a;
+    --card-radius: 16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root, .viz-root {
+      --surface-1:      #1a1a19;
+      --page:           #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --grid:           #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --series-1-soft:  rgba(57,135,229,0.18);
+      --good:           #0ca30c;
+      --warning:        #fab219;
+      --warning-bg:     #fab21922;
+      --critical:       #e66767;
+      --critical-bg:    #e667671f;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    --surface-1:      #1a1a19;
+    --page:           #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --grid:           #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --series-1-soft:  rgba(57,135,229,0.18);
+    --good:           #0ca30c;
+    --warning:        #fab219;
+    --warning-bg:     #fab21922;
+    --critical:       #e66767;
+    --critical-bg:    #e667671f;
+  }
+  :root[data-theme="light"] .viz-root {
+    --surface-1:      #fcfcfb;
+    --page:           #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --grid:           #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --series-1-soft:  rgba(42,120,214,0.14);
+    --good:           #0ca30c;
+    --warning:        #b8790f;
+    --warning-bg:     #fab21922;
+    --critical:       #d03b3b;
+    --critical-bg:    #d03b3b1a;
+  }
+
+  * { box-sizing: border-box; }
+  .viz-root {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page);
+    color: var(--text-primary);
+    padding: 32px 20px 60px;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  .hero h1 { font-size: 2.1rem; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.02em; }
+  .hero p { margin: 0 0 20px; color: var(--text-secondary); font-size: 0.98rem; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--grid); }
+  .tab-btn {
+    font-family: inherit; font-size: 0.88rem; font-weight: 700; color: var(--text-muted);
+    background: none; border: none; padding: 10px 4px; margin-right: 20px; cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .tab-btn:hover { color: var(--text-primary); }
+  .tab-btn.active { color: var(--series-1); border-bottom-color: var(--series-1); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  @media (min-width: 900px) {
+    .grid { grid-template-columns: 380px 1fr; align-items: start; }
+  }
+  .grid.wide-inputs { grid-template-columns: 1fr; }
+  @media (min-width: 900px) {
+    .grid.wide-inputs { grid-template-columns: 1fr; }
+  }
+  .col { display: flex; flex-direction: column; gap: 20px; }
+
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    padding: 22px 22px 24px;
+  }
+  .card h2 { font-size: 1.05rem; font-weight: 750; margin: 0 0 4px; }
+  .card .card-sub { font-size: 0.78rem; color: var(--text-muted); margin: 0 0 18px; }
+  .card h2 .muted-tag { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); background: var(--grid); padding: 2px 8px; border-radius: 999px; margin-left: 8px; vertical-align: 1px; }
+
+  .group-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 12px; }
+
+  .field { margin-bottom: 20px; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.86rem; font-weight: 600; margin-bottom: 8px; }
+  .field-label span:first-child { color: var(--text-primary); }
+  .field-value { font-variant-numeric: tabular-nums; color: var(--series-1); font-weight: 700; }
+  .field-hint { font-size: 0.74rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4; }
+  .field-hint b { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+  input[type="range"] {
+    width: 100%; height: 4px; border-radius: 999px; background: var(--grid);
+    -webkit-appearance: none; appearance: none; outline: none; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--series-1); border: 3px solid var(--surface-1); box-shadow: 0 0 0 1px var(--series-1); cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px; border-radius: 50%; background: var(--series-1);
+    border: 3px solid var(--surface-1); box-shadow: 0 0 0 1px var(--series-1); cursor: pointer;
+  }
+
+  .numfield { display: flex; align-items: stretch; gap: 8px; }
+  .numfield input { flex: 1; min-width: 0; font-size: 0.95rem; font-weight: 600; font-variant-numeric: tabular-nums;
+    padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--page);
+    color: var(--text-primary); outline: none; }
+  .numfield input:focus { border-color: var(--series-1); }
+  .numfield .suffix { display: flex; align-items: center; padding: 0 12px; font-size: 0.82rem; font-weight: 600;
+    color: var(--text-muted); border: 1px solid var(--border); border-radius: 10px; background: var(--page); }
+  .stepbtn {
+    width: 36px; border-radius: 10px; border: 1px solid var(--border); background: var(--page);
+    color: var(--text-primary); font-size: 1.05rem; cursor: pointer; font-weight: 600;
+  }
+  .stepbtn:hover { border-color: var(--series-1); color: var(--series-1); }
+  .divider { height: 1px; background: var(--grid); margin: 18px 0; }
+  .info-box { font-size: 0.78rem; color: var(--text-secondary); background: var(--page); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; margin: 4px 0 18px; }
+  .info-box b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .info-box.accent { border-color: var(--series-1); }
+  .info-box.accent b { color: var(--series-1); }
+
+  details.subgroup { border-top: 1px solid var(--grid); padding-top: 14px; margin-bottom: 20px; }
+  details.subgroup summary { cursor: pointer; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
+    color: var(--text-muted); list-style: revert; margin-bottom: 4px; }
+  details.subgroup summary .summary-hint { text-transform: none; font-weight: 500; letter-spacing: 0; color: var(--text-muted); }
+  details.subgroup[open] summary { margin-bottom: 16px; color: var(--text-primary); }
+  details.subgroup .field:first-of-type { margin-top: 4px; }
+
+  details.info-bubble { margin-top: 10px; }
+  details.info-bubble summary { cursor: pointer; font-size: 0.76rem; font-weight: 600; color: var(--series-1); list-style: none; }
+  details.info-bubble summary::-webkit-details-marker { display: none; }
+  details.info-bubble .bubble-text {
+    margin-top: 8px; background: var(--series-1-soft); border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 14px; font-size: 0.78rem; line-height: 1.55; color: var(--text-secondary);
+  }
+  details.info-bubble .bubble-text ul { margin: 6px 0; padding-left: 18px; }
+  details.info-bubble .bubble-text li { margin-bottom: 3px; }
+  details.info-bubble .bubble-text b { color: var(--text-primary); }
+
+  .mini-summary { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+  .mini-summary.center { text-align: center; margin: 28px 0 4px; }
+  .mini-summary b { color: var(--text-secondary); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .hero-stat-row { display: flex; gap: 80px; justify-content: center; flex-wrap: wrap; padding: 6px 0 4px; }
+  .hero-stat { text-align: center; }
+  .hero-stat-label { font-size: 0.76rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+  .hero-stat-value { font-size: 3.1rem; font-weight: 800; letter-spacing: -0.02em; color: var(--series-1); font-variant-numeric: tabular-nums; }
+  .hero-stat-value.small { font-size: 2.3rem; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 18px 24px; }
+  .stat-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+  .stat-value { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+  .stat-value.big { font-size: 2.1rem; }
+  .stat-value.accent { color: var(--series-1); }
+
+  table.breakdown { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 4px; }
+  table.breakdown th { text-align: right; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); font-weight: 700; padding: 0 0 8px; border-bottom: 1px solid var(--grid); }
+  table.breakdown th:first-child, table.breakdown td:first-child { text-align: left; }
+  table.breakdown td { padding: 9px 0; border-bottom: 1px solid var(--grid); text-align: right; font-variant-numeric: tabular-nums; }
+  table.breakdown tr:last-child td { border-bottom: none; font-weight: 700; }
+  table.breakdown td.label { font-weight: 600; color: var(--text-primary); }
+  table.breakdown td.muted { color: var(--text-muted); font-weight: 500; }
+  table.breakdown td.net { color: var(--series-1); font-weight: 700; }
+
+  .split-bar { display: flex; height: 26px; border-radius: 8px; overflow: hidden; margin: 14px 0 6px; border: 1px solid var(--border); }
+  .split-bar > div { display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; }
+  .split-upfront { background: var(--series-1); }
+  .split-deferred { background: var(--text-muted); }
+  .legend-row { display: flex; gap: 18px; font-size: 0.76rem; color: var(--text-secondary); flex-wrap: wrap; }
+  .legend-dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: 1px; }
+
+  .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; padding: 6px 12px; border-radius: 999px; }
+  .badge.good { color: var(--good); background: rgba(12,163,12,0.12); }
+  .badge.warning { color: var(--warning); background: var(--warning-bg); }
+  .badge.critical { color: var(--critical); background: var(--critical-bg); }
+
+  .chart-wrap { position: relative; margin-top: 6px; }
+  svg.chart { width: 100%; height: 230px; overflow: visible; display: block; }
+  .chart-tooltip {
+    position: absolute; pointer-events: none; background: var(--text-primary); color: var(--surface-1);
+    font-size: 0.74rem; font-weight: 600; padding: 6px 10px; border-radius: 8px; transform: translate(-50%,-115%);
+    white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 5;
+  }
+  .chart-tooltip b { font-variant-numeric: tabular-nums; }
+
+  .foot-note { font-size: 0.74rem; color: var(--text-muted); line-height: 1.5; margin-top: 4px; }
+
+  /* staged tab specific */
+  .stage-cols { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 720px) {
+    .stage-cols { grid-template-columns: repeat(3, 1fr); }
+  }
+  .stage-card { background: var(--page); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .stage-card h3 { font-size: 0.82rem; font-weight: 800; margin: 0 0 2px; color: var(--text-primary); }
+  .stage-card .stage-sub { font-size: 0.7rem; color: var(--text-muted); margin: 0 0 14px; }
+  .stage-total-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 4px; }
+  .stage-total { background: var(--page); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; text-align: center; }
+  .stage-total .stage-total-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); margin-bottom: 6px; }
+  .stage-total .stage-total-value { font-size: 1.5rem; font-weight: 800; color: var(--series-1); font-variant-numeric: tabular-nums; }
+</style>
+
+<div class="viz-root">
+  <div class="wrap">
+    <div class="hero">
+      <h1>Chekin Exit</h1>
+      <p>Calcula la valoración de exit y qué dinero neto tendrías disponible al mes y al año.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="single">Venta única</button>
+      <button class="tab-btn" data-tab="staged">Venta por etapas</button>
+    </div>
+
+    <!-- ======================= TAB 1: VENTA ÚNICA ======================= -->
+    <div class="tab-panel active" id="tab-single">
+    <div class="grid">
+      <!-- INPUTS -->
+      <div class="col">
+        <div class="card">
+          <h2>Tus parámetros</h2>
+          <div class="card-sub">Todo se recalcula al instante.</div>
+
+          <div class="group-label">Compañía</div>
+          <div class="field">
+            <div class="field-label"><span>MRR actual</span><span class="field-value" id="mrrDisplay">—</span></div>
+            <div class="numfield">
+              <button class="stepbtn" data-step="mrr" data-dir="-1">−</button>
+              <input type="text" id="mrr" inputmode="numeric" value="600">
+              <span class="suffix">×1.000 €</span>
+              <button class="stepbtn" data-step="mrr" data-dir="1">+</button>
+            </div>
+            <div class="field-hint">Escribe 500 para 500K €, 600 para 600K €. Se mueve de mil en mil. ARR = MRR × 12.</div>
+          </div>
+
+          <div class="field">
+            <div class="field-label"><span>Multiple sobre ARR</span><span class="field-value" id="multipleVal">7.0×</span></div>
+            <input type="range" id="multiple" min="2" max="15" step="0.5" value="7">
+            <div class="field-hint">Rango típico SaaS B2B: 4×–10× ARR. Es el valor total del deal.</div>
+          </div>
+
+          <details class="subgroup">
+            <summary>Cap table al cierre <span class="summary-hint" id="capTableSummary">(37% equity · 15% phantom)</span></summary>
+
+            <div class="field">
+              <div class="field-label"><span>Equity</span><span class="field-value" id="equityPctVal">37%</span></div>
+              <input type="range" id="equityPct" min="0" max="100" step="1" value="37">
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Tributación equity</span><span class="field-value" id="equityTaxVal">1.25%</span></div>
+              <input type="range" id="equityTax" min="0" max="10" step="0.25" value="1.25">
+              <div class="field-hint">Ganancia patrimonial normal: tipo reducido.</div>
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Phantom shares</span><span class="field-value" id="phantomPctVal">15%</span></div>
+              <input type="range" id="phantomPct" min="0" max="100" step="1" value="15">
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Tributación phantom shares</span><span class="field-value" id="phantomTaxVal">47%</span></div>
+              <input type="range" id="phantomTax" min="0" max="55" step="1" value="47">
+              <div class="field-hint">Tributa como rendimiento del trabajo: tipo marginal alto.</div>
+            </div>
+            <div class="info-box">Tu ownership total: <b id="totalOwnership">52%</b> sobre la valoración total.</div>
+          </details>
+
+          <details class="subgroup">
+            <summary>Earn-out <span class="summary-hint" id="earnoutSummary">(40% del deal · tu parte 50%)</span></summary>
+
+            <div class="field">
+              <div class="field-label"><span>Earn-out sobre el deal total</span><span class="field-value" id="earnoutDealVal">40%</span></div>
+              <input type="range" id="earnoutDeal" min="0" max="70" step="5" value="40">
+              <div class="field-hint">Ej: deal de 50M con 20M en earn-out ≈ 40%.</div>
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Tu parte del earn-out</span><span class="field-value" id="earnoutShareVal">50%</span></div>
+              <input type="range" id="earnoutShare" min="0" max="100" step="5" value="50">
+              <div class="field-hint">Reparto del pool de earn-out, no siempre igual a tu ownership.</div>
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Tributación earn-out</span><span class="field-value" id="earnoutTaxVal">0%</span></div>
+              <input type="range" id="earnoutTax" min="0" max="47" step="1" value="0">
+              <div class="field-hint">Se suele estructurar fuera de la compañía; ajústalo si aplica.</div>
+            </div>
+            <div class="field" id="earnoutYearsWrap">
+              <div class="field-label"><span>Periodo de earn-out</span><span class="field-value" id="earnoutYearsVal">3 años</span></div>
+              <input type="range" id="earnoutYears" min="1" max="5" step="1" value="3">
+            </div>
+          </details>
+
+          <div class="group-label">Gestión del patrimonio</div>
+
+          <div class="field">
+            <div class="field-label"><span>Colchón seguro</span><span class="field-value" id="colchonRateVal">3.5%</span></div>
+            <div class="numfield" style="margin-bottom:10px;">
+              <input type="text" id="colchonM" inputmode="numeric" value="10">
+              <span class="suffix">M €</span>
+            </div>
+            <input type="range" id="colchonRate" min="2" max="5" step="0.25" value="3.5">
+            <div class="field-hint">Tu "seguro de vida": parte casi garantizada (bonos/depósitos), rentabilidad baja pero segura.</div>
+          </div>
+
+          <div class="field">
+            <div class="field-label"><span>Rentabilidad cartera diversificada</span><span class="field-value" id="restoRateVal">8%</span></div>
+            <input type="range" id="restoRate" min="4" max="14" step="0.5" value="8">
+            <div class="field-hint">Sobre el resto del capital: <b id="restoAmountDisplay">—</b></div>
+            <details class="info-bubble">
+              <summary>ℹ️ Cómo distribuiría yo esta parte</summary>
+              <div class="bubble-text">
+                Con el colchón ya cubriendo el escenario conservador, para el resto asumiría más riesgo, pero diversificado, sin jugármela a una sola carta:
+                <ul>
+                  <li><b>45% renta variable global</b> (ETFs indexados MSCI World / ACWI) — motor de crecimiento a largo plazo.</li>
+                  <li><b>20% private equity / venture / co-inversiones</b> — mayor retorno esperado; asumible porque esta parte no necesita liquidez inmediata.</li>
+                  <li><b>20% renta fija diversificada</b> (investment grade + algo de high yield) — amortigua la volatilidad de la parte en bolsa.</li>
+                  <li><b>15% liquidez / muy corto plazo</b> — para oportunidades puntuales y como colchón operativo.</li>
+                </ul>
+                Con esa mezcla, un 7–9% anual a largo plazo es razonable para un perfil de riesgo alto pero no temerario.
+              </div>
+            </details>
+          </div>
+
+          <div class="info-box accent">Rentabilidad anual blended: <b id="blendedRateVal">—</b></div>
+
+          <div class="field">
+            <div class="field-label"><span>Retiro mensual deseado</span><span class="field-value" id="withdrawalDisplay">—</span></div>
+            <div class="numfield">
+              <button class="stepbtn" data-step="withdrawal" data-dir="-1">−</button>
+              <input type="text" id="withdrawal" inputmode="numeric" value="50">
+              <span class="suffix">×1.000 €</span>
+              <button class="stepbtn" data-step="withdrawal" data-dir="1">+</button>
+            </div>
+            <div class="field-hint">Escribe 50 para 50K €/mes. Se mueve de mil en mil.</div>
+          </div>
+
+          <div class="field">
+            <div class="field-label"><span>Años a proyectar</span><span class="field-value" id="yearsVal">20 años</span></div>
+            <input type="range" id="years" min="5" max="40" step="1" value="20">
+          </div>
+        </div>
+      </div>
+
+      <!-- OUTPUTS -->
+      <div class="col">
+        <div class="card">
+          <div class="hero-stat-row">
+            <div class="hero-stat">
+              <div class="hero-stat-label">Exit Neto Upfront</div>
+              <div class="hero-stat-value" id="outNetUpfront">—</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-label">Exit Neto con Earn-out</div>
+              <div class="hero-stat-value" id="outNet">—</div>
+            </div>
+          </div>
+          <div class="mini-summary center" id="miniSummary">ARR — · Valoración deal — · Importe al cierre —</div>
+
+          <div class="divider"></div>
+          <table class="breakdown">
+            <thead><tr><th>Bucket</th><th>Bruto</th><th>Impuesto</th><th>Neto</th></tr></thead>
+            <tbody>
+              <tr><td class="label">Equity</td><td id="rowEquityGross">—</td><td class="muted" id="rowEquityTax">—</td><td class="net" id="rowEquityNet">—</td></tr>
+              <tr><td class="label">Phantom shares</td><td id="rowPhantomGross">—</td><td class="muted" id="rowPhantomTax">—</td><td class="net" id="rowPhantomNet">—</td></tr>
+              <tr><td class="label">Earn-out (tu parte)</td><td id="rowEarnoutGross">—</td><td class="muted" id="rowEarnoutTax">—</td><td class="net" id="rowEarnoutNet">—</td></tr>
+              <tr><td class="label">Total</td><td id="rowTotalGross">—</td><td class="muted" id="rowTotalTax">—</td><td class="net" id="rowTotalNet">—</td></tr>
+            </tbody>
+          </table>
+
+          <div class="split-bar" id="splitBar"></div>
+          <div class="legend-row">
+            <span><span class="legend-dot" style="background:var(--series-1)"></span>Al cierre (equity+phantom): <b id="upfrontLegend">—</b></span>
+            <span><span class="legend-dot" style="background:var(--text-muted)"></span>Diferido (earn-out): <b id="deferredLegend">—</b></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Tu dinero disponible</h2>
+          <div class="stat-row">
+            <div class="stat">
+              <div class="stat-label">Al mes</div>
+              <div class="stat-value big" id="outMonthly">—</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Al año</div>
+              <div class="stat-value big" id="outAnnual">—</div>
+            </div>
+          </div>
+          <div class="foot-note">Es el retiro mensual que has definido más abajo. Comprueba en la simulación si el capital lo aguanta durante todo el periodo proyectado.</div>
+        </div>
+
+        <div class="card">
+          <h2>Simulación con tus retiros mensuales</h2>
+          <div class="stat-row" style="margin-bottom:6px;">
+            <div class="stat">
+              <div class="stat-label">Balance final (año <span id="finalYearLabel">20</span>)</div>
+              <div class="stat-value big accent" id="outFinalBalance">—</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Estado</div>
+              <div id="outBadge"></div>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <svg class="chart" id="chart" viewBox="0 0 640 230" preserveAspectRatio="none"></svg>
+            <div class="chart-tooltip" id="tooltip"></div>
+          </div>
+          <div class="foot-note" id="chartFootnote"></div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- ======================= TAB 2: VENTA POR ETAPAS ======================= -->
+    <div class="tab-panel" id="tab-staged">
+      <div class="card" style="margin-bottom:20px;">
+        <h2>Etapas de la operación</h2>
+        <div class="card-sub">3 momentos de venta independientes. Cada uno con su propio MRR, multiple e impuestos. Todo editable.</div>
+
+        <div class="stage-cols">
+          <!-- ETAPA 1 -->
+          <div class="stage-card">
+            <h3>Etapa 1</h3>
+            <div class="stage-sub">Solo equity, sin earn-out</div>
+
+            <div class="field">
+              <div class="field-label"><span>MRR</span><span class="field-value" id="st1_mrrDisplay">—</span></div>
+              <div class="numfield">
+                <input type="text" id="st1_mrr" inputmode="numeric" value="580">
+                <span class="suffix">×1.000 €</span>
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Multiple ARR</span><span class="field-value" id="st1_multipleVal">6.0×</span></div>
+              <input type="range" id="st1_multiple" min="2" max="15" step="0.5" value="6">
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Equity vendido</span><span class="field-value" id="st1_equityPctVal">25%</span></div>
+              <input type="range" id="st1_equityPct" min="0" max="100" step="1" value="25">
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Tributación equity</span><span class="field-value" id="st1_equityTaxVal">1.25%</span></div>
+              <input type="range" id="st1_equityTax" min="0" max="10" step="0.25" value="1.25">
+            </div>
+          </div>
+
+          <!-- ETAPA 2 -->
+          <div class="stage-card">
+            <h3>Etapa 2</h3>
+            <div class="stage-sub">Equity + phantom + 1ª mitad earn-out</div>
+
+            <div class="field">
+              <div class="field-label"><span>MRR</span><span class="field-value" id="st2_mrrDisplay">—</span></div>
+              <div class="numfield">
+                <input type="text" id="st2_mrr" inputmode="numeric" value="800">
+                <span class="suffix">×1.000 €</span>
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Multiple ARR</span><span class="field-value" id="st2_multipleVal">6.0×</span></div>
+              <input type="range" id="st2_multiple" min="2" max="15" step="0.5" value="6">
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Equity vendido</span><span class="field-value" id="st2_equityPctVal">12%</span></div>
+              <input type="range" id="st2_equityPct" min="0" max="100" step="1" value="12">
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Tributación equity</span><span class="field-value" id="st2_equityTaxVal">1.25%</span></div>
+              <input type="range" id="st2_equityTax" min="0" max="10" step="0.25" value="1.25">
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Phantom vendido</span><span class="field-value" id="st2_phantomPctVal">10%</span></div>
+              <input type="range" id="st2_phantomPct" min="0" max="100" step="1" value="10">
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Tributación phantom</span><span class="field-value" id="st2_phantomTaxVal">10%</span></div>
+              <input type="range" id="st2_phantomTax" min="0" max="55" step="1" value="10">
+            </div>
+            <div class="divider"></div>
+            <div class="field">
+              <div class="field-label"><span>Earn-out total operación</span><span class="field-value" id="earnoutTotalMVal">10M €</span></div>
+              <div class="numfield">
+                <input type="text" id="earnoutTotalM" inputmode="numeric" value="10">
+                <span class="suffix">M €</span>
+              </div>
+              <div class="field-hint">Pool total del earn-out, repartido entre etapa 2 y 3.</div>
+            </div>
+            <div class="field">
+              <div class="field-label"><span>% del earn-out entregado aquí</span><span class="field-value" id="st2_earnoutPctVal">50%</span></div>
+              <input type="range" id="st2_earnoutPct" min="0" max="100" step="5" value="50">
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Tributación earn-out</span><span class="field-value" id="st2_earnoutTaxVal">0%</span></div>
+              <input type="range" id="st2_earnoutTax" min="0" max="47" step="1" value="0">
+            </div>
+          </div>
+
+          <!-- ETAPA 3 -->
+          <div class="stage-card">
+            <h3>Etapa 3</h3>
+            <div class="stage-sub">Equity + phantom + 2ª mitad earn-out</div>
+
+            <div class="field">
+              <div class="field-label"><span>MRR</span><span class="field-value" id="st3_mrrDisplay">—</span></div>
+              <div class="numfield">
+                <input type="text" id="st3_mrr" inputmode="numeric" value="1000">
+                <span class="suffix">×1.000 €</span>
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Multiple ARR</span><span class="field-value" id="st3_multipleVal">6.0×</span></div>
+              <input type="range" id="st3_multiple" min="2" max="15" step="0.5" value="6">
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Equity vendido</span><span class="field-value" id="st3_equityPctVal">6%</span></div>
+              <input type="range" id="st3_equityPct" min="0" max="100" step="1" value="6">
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Tributación equity</span><span class="field-value" id="st3_equityTaxVal">1.25%</span></div>
+              <input type="range" id="st3_equityTax" min="0" max="10" step="0.25" value="1.25">
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Phantom vendido</span><span class="field-value" id="st3_phantomPctVal">8%</span></div>
+              <input type="range" id="st3_phantomPct" min="0" max="100" step="1" value="8">
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Tributación phantom</span><span class="field-value" id="st3_phantomTaxVal">10%</span></div>
+              <input type="range" id="st3_phantomTax" min="0" max="55" step="1" value="10">
+            </div>
+            <div class="divider"></div>
+            <div class="field">
+              <div class="field-label"><span>% del earn-out entregado aquí</span><span class="field-value" id="st3_earnoutPctVal">50%</span></div>
+              <input type="range" id="st3_earnoutPct" min="0" max="100" step="5" value="50">
+              <div class="field-hint">Repartido: <b id="earnoutSplitCheck">—</b></div>
+            </div>
+            <div class="field">
+              <div class="field-label"><span>Tributación earn-out</span><span class="field-value" id="st3_earnoutTaxVal">0%</span></div>
+              <input type="range" id="st3_earnoutTax" min="0" max="47" step="1" value="0">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hero-stat-row">
+          <div class="hero-stat">
+            <div class="hero-stat-label">Total acumulado 3 etapas</div>
+            <div class="hero-stat-value" id="stagedGrandTotal">—</div>
+          </div>
+        </div>
+
+        <div class="stage-total-row">
+          <div class="stage-total">
+            <div class="stage-total-label">Etapa 1</div>
+            <div class="stage-total-value" id="stagedTotal1">—</div>
+          </div>
+          <div class="stage-total">
+            <div class="stage-total-label">Etapa 2</div>
+            <div class="stage-total-value" id="stagedTotal2">—</div>
+          </div>
+          <div class="stage-total">
+            <div class="stage-total-label">Etapa 3</div>
+            <div class="stage-total-value" id="stagedTotal3">—</div>
+          </div>
+        </div>
+
+        <div class="chart-wrap" style="margin-top:22px;">
+          <svg class="chart" id="stagedChart" viewBox="0 0 640 200" preserveAspectRatio="none"></svg>
+          <div class="chart-tooltip" id="stagedTooltip"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <table class="breakdown">
+          <thead><tr><th>Etapa</th><th>Equity neto</th><th>Phantom neto</th><th>Earn-out neto</th><th>Total</th></tr></thead>
+          <tbody>
+            <tr><td class="label">Etapa 1</td><td id="st1_rowEquity">—</td><td id="st1_rowPhantom">—</td><td id="st1_rowEarnout">—</td><td class="net" id="st1_rowTotal">—</td></tr>
+            <tr><td class="label">Etapa 2</td><td id="st2_rowEquity">—</td><td id="st2_rowPhantom">—</td><td id="st2_rowEarnout">—</td><td class="net" id="st2_rowTotal">—</td></tr>
+            <tr><td class="label">Etapa 3</td><td id="st3_rowEquity">—</td><td id="st3_rowPhantom">—</td><td id="st3_rowEarnout">—</td><td class="net" id="st3_rowTotal">—</td></tr>
+            <tr><td class="label">Total</td><td id="stg_rowEquity">—</td><td id="stg_rowPhantom">—</td><td id="stg_rowEarnout">—</td><td class="net" id="stg_rowTotal">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  function parseThousands(str){
+    const n = parseFloat(String(str).replace(/[^\d.\-]/g,''));
+    return isNaN(n) ? 0 : n * 1000;
+  }
+
+  function fmtMoney(n, decimals){
+    const sign = n < 0 ? '-' : '';
+    n = Math.abs(n);
+    if(n >= 1e6) return sign + (n/1e6).toLocaleString('es-ES',{maximumFractionDigits: decimals!==undefined?decimals:2}) + 'M €';
+    if(n >= 1e3) return sign + (n/1e3).toLocaleString('es-ES',{maximumFractionDigits: decimals!==undefined?decimals:1}) + 'K €';
+    return sign + n.toLocaleString('es-ES',{maximumFractionDigits:0}) + ' €';
+  }
+
+  // ---------- TABS ----------
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      $('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ======================================================================
+  // TAB 1: VENTA ÚNICA
+  // ======================================================================
+  const inputs = {
+    mrr: $('mrr'), multiple: $('multiple'),
+    equityPct: $('equityPct'), equityTax: $('equityTax'),
+    phantomPct: $('phantomPct'), phantomTax: $('phantomTax'),
+    earnoutDeal: $('earnoutDeal'), earnoutShare: $('earnoutShare'), earnoutTax: $('earnoutTax'), earnoutYears: $('earnoutYears'),
+    colchonM: $('colchonM'), colchonRate: $('colchonRate'), restoRate: $('restoRate'),
+    withdrawal: $('withdrawal'), years: $('years')
+  };
+
+  function readState(){
+    return {
+      mrr: parseThousands(inputs.mrr.value),
+      multiple: parseFloat(inputs.multiple.value),
+      equityPct: parseFloat(inputs.equityPct.value),
+      equityTax: parseFloat(inputs.equityTax.value),
+      phantomPct: parseFloat(inputs.phantomPct.value),
+      phantomTax: parseFloat(inputs.phantomTax.value),
+      earnoutDealPct: parseFloat(inputs.earnoutDeal.value),
+      earnoutSharePct: parseFloat(inputs.earnoutShare.value),
+      earnoutTax: parseFloat(inputs.earnoutTax.value),
+      earnoutYears: parseInt(inputs.earnoutYears.value,10),
+      colchonM: parseFloat(inputs.colchonM.value) || 0,
+      colchonRate: parseFloat(inputs.colchonRate.value),
+      restoRate: parseFloat(inputs.restoRate.value),
+      withdrawal: parseThousands(inputs.withdrawal.value),
+      years: parseInt(inputs.years.value,10)
+    };
+  }
+
+  function simulate(s){
+    const arr = s.mrr * 12;
+    const valuation = arr * s.multiple;
+
+    const earnoutPool = valuation * (s.earnoutDealPct/100);
+    const closingAmount = valuation - earnoutPool;
+
+    const equityGross = valuation * (s.equityPct/100);
+    const phantomGross = valuation * (s.phantomPct/100);
+    const equityTaxAmt = equityGross * (s.equityTax/100);
+    const phantomTaxAmt = phantomGross * (s.phantomTax/100);
+    const equityNet = equityGross - equityTaxAmt;
+    const phantomNet = phantomGross - phantomTaxAmt;
+
+    const earnoutGross = earnoutPool * (s.earnoutSharePct/100);
+    const earnoutTaxAmt = earnoutGross * (s.earnoutTax/100);
+    const earnoutNet = earnoutGross - earnoutTaxAmt;
+
+    const net = equityNet + phantomNet + earnoutNet;
+    const upfront = equityNet + phantomNet;
+    const deferred = earnoutNet;
+    const installment = (s.earnoutDealPct > 0 && s.earnoutYears > 0) ? deferred / s.earnoutYears : 0;
+
+    const colchonAmount = Math.min(s.colchonM * 1e6, Math.max(net,0));
+    const restoAmount = Math.max(net - colchonAmount, 0);
+    const blendedRate = net > 0
+      ? (colchonAmount * (s.colchonRate/100) + restoAmount * (s.restoRate/100)) / net * 100
+      : s.restoRate;
+
+    const monthlyRate = (blendedRate/100) / 12;
+    let balance = upfront;
+    const yearly = [balance];
+    let depletionYear = null;
+
+    for(let y = 1; y <= s.years; y++){
+      if(s.earnoutDealPct > 0 && y <= s.earnoutYears){
+        balance += installment;
+      }
+      for(let m = 0; m < 12; m++){
+        balance = balance * (1 + monthlyRate) - s.withdrawal;
+        if(balance <= 0){
+          balance = 0;
+          if(depletionYear === null) depletionYear = y + (m+1)/12;
+        }
+      }
+      yearly.push(balance);
+    }
+
+    const sustainableMonthly = net * (blendedRate/100) / 12;
+
+    return { arr, valuation, earnoutPool, closingAmount,
+             equityGross, equityTaxAmt, equityNet,
+             phantomGross, phantomTaxAmt, phantomNet,
+             earnoutGross, earnoutTaxAmt, earnoutNet,
+             net, upfront, deferred, installment,
+             colchonAmount, restoAmount, blendedRate,
+             yearly, depletionYear, sustainableMonthly };
+  }
+
+  function renderChart(yearly, depletionYear, years){
+    const svg = $('chart');
+    svg.innerHTML = '';
+    const W = 640, H = 230, padL = 4, padR = 4, padT = 14, padB = 22;
+    const max = Math.max(...yearly, 1);
+    const min = 0;
+    const x = i => padL + (W - padL - padR) * (i / years);
+    const y = v => padT + (H - padT - padB) * (1 - (v - min) / (max - min || 1));
+
+    const ns = 'http://www.w3.org/2000/svg';
+    const mk = (tag, attrs) => {
+      const el = document.createElementNS(ns, tag);
+      for(const k in attrs) el.setAttribute(k, attrs[k]);
+      return el;
+    };
+
+    for(let g = 0; g <= 2; g++){
+      const gv = max * g / 2;
+      const gy = y(gv);
+      svg.appendChild(mk('line', {x1:padL, x2:W-padR, y1:gy, y2:gy, stroke:'var(--grid)', 'stroke-width':1}));
+    }
+    svg.appendChild(mk('line', {x1:padL, x2:W-padR, y1:y(0), y2:y(0), stroke:'var(--baseline)', 'stroke-width':1}));
+
+    let d = `M ${x(0)} ${y(yearly[0])}`;
+    for(let i=1;i<yearly.length;i++) d += ` L ${x(i)} ${y(yearly[i])}`;
+    const areaD = d + ` L ${x(yearly.length-1)} ${y(0)} L ${x(0)} ${y(0)} Z`;
+
+    const gradId = 'gradFill';
+    const defs = mk('defs', {});
+    const grad = mk('linearGradient', {id: gradId, x1:0, y1:0, x2:0, y2:1});
+    grad.appendChild(mk('stop', {offset:'0%', 'stop-color':'var(--series-1)', 'stop-opacity':0.28}));
+    grad.appendChild(mk('stop', {offset:'100%', 'stop-color':'var(--series-1)', 'stop-opacity':0}));
+    defs.appendChild(grad);
+    svg.appendChild(defs);
+
+    svg.appendChild(mk('path', {d: areaD, fill: `url(#${gradId})`, stroke:'none'}));
+    svg.appendChild(mk('path', {d, fill:'none', stroke:'var(--series-1)', 'stroke-width':2, 'stroke-linejoin':'round', 'stroke-linecap':'round'}));
+
+    svg.appendChild(mk('circle', {cx:x(0), cy:y(yearly[0]), r:4, fill:'var(--series-1)'}));
+    svg.appendChild(mk('circle', {cx:x(yearly.length-1), cy:y(yearly[yearly.length-1]), r:4, fill:'var(--series-1)'}));
+
+    const endLabel = mk('text', {x:x(yearly.length-1), y:y(yearly[yearly.length-1]) - 10, 'text-anchor':'end', fill:'var(--text-primary)', 'font-size':11, 'font-weight':700});
+    endLabel.textContent = fmtMoney(yearly[yearly.length-1],1);
+    svg.appendChild(endLabel);
+
+    if(depletionYear !== null && depletionYear <= years){
+      const dx = x(depletionYear);
+      svg.appendChild(mk('line', {x1:dx, x2:dx, y1:padT, y2:y(0), stroke:'var(--critical)', 'stroke-width':1.5, 'stroke-dasharray':'3,3'}));
+      const lbl = mk('text', {x:dx, y:padT-2, 'text-anchor': depletionYear > years*0.7 ? 'end':'start', fill:'var(--critical)', 'font-size':10.5, 'font-weight':700});
+      lbl.textContent = 'Agotado año ' + depletionYear.toFixed(1);
+      svg.appendChild(lbl);
+    }
+
+    [0, Math.round(years/2), years].forEach(yr => {
+      const t = mk('text', {x:x(yr), y:H-4, 'text-anchor': yr===0?'start':(yr===years?'end':'middle'), fill:'var(--text-muted)', 'font-size':10.5});
+      t.textContent = 'Año ' + yr;
+      svg.appendChild(t);
+    });
+
+    const hit = mk('rect', {x:padL, y:0, width:W-padL-padR, height:H, fill:'transparent'});
+    svg.appendChild(hit);
+    const tooltip = $('tooltip');
+
+    hit.addEventListener('mousemove', (e) => {
+      const rect = svg.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width * W;
+      const yr = Math.round((px - padL) / (W - padL - padR) * years);
+      const idx = Math.max(0, Math.min(years, yr));
+      const val = yearly[idx];
+      tooltip.style.left = ((x(idx)/W) * rect.width) + 'px';
+      tooltip.style.top = ((y(val)/H) * rect.height) + 'px';
+      tooltip.innerHTML = 'Año ' + idx + ': <b>' + fmtMoney(val,2) + '</b>';
+      tooltip.style.opacity = 1;
+    });
+    hit.addEventListener('mouseleave', () => { tooltip.style.opacity = 0; });
+  }
+
+  function update(){
+    const s = readState();
+
+    $('mrrDisplay').textContent = fmtMoney(s.mrr,1);
+    $('withdrawalDisplay').textContent = fmtMoney(s.withdrawal,1) + ' / mes';
+    $('multipleVal').textContent = s.multiple.toFixed(1) + '×';
+    $('equityPctVal').textContent = s.equityPct + '%';
+    $('equityTaxVal').textContent = s.equityTax.toFixed(2).replace(/\.?0+$/,'') + '%';
+    $('phantomPctVal').textContent = s.phantomPct + '%';
+    $('phantomTaxVal').textContent = s.phantomTax + '%';
+    $('totalOwnership').textContent = (s.equityPct + s.phantomPct) + '%';
+    $('capTableSummary').textContent = `(${s.equityPct}% equity · ${s.phantomPct}% phantom)`;
+    $('earnoutDealVal').textContent = s.earnoutDealPct + '%';
+    $('earnoutShareVal').textContent = s.earnoutSharePct + '%';
+    $('earnoutTaxVal').textContent = s.earnoutTax + '%';
+    $('earnoutYearsVal').textContent = s.earnoutYears + (s.earnoutYears===1?' año':' años');
+    $('earnoutSummary').textContent = `(${s.earnoutDealPct}% del deal · tu parte ${s.earnoutSharePct}%)`;
+    $('colchonRateVal').textContent = s.colchonRate.toFixed(2).replace(/\.?0+$/,'') + '%';
+    $('restoRateVal').textContent = s.restoRate + '%';
+    $('yearsVal').textContent = s.years + ' años';
+    $('finalYearLabel').textContent = s.years;
+
+    $('earnoutYearsWrap').classList.toggle('disabled', s.earnoutDealPct === 0);
+
+    const r = simulate(s);
+
+    $('miniSummary').innerHTML = `ARR <b>${fmtMoney(r.arr,1)}</b> · Valoración deal <b>${fmtMoney(r.valuation,1)}</b> · Importe al cierre <b>${fmtMoney(r.closingAmount,1)}</b>`;
+    $('outNetUpfront').textContent = fmtMoney(r.upfront,2);
+    $('outNet').textContent = fmtMoney(r.net,2);
+
+    $('rowEquityGross').textContent = fmtMoney(r.equityGross,2);
+    $('rowEquityTax').textContent = '-' + fmtMoney(r.equityTaxAmt,2);
+    $('rowEquityNet').textContent = fmtMoney(r.equityNet,2);
+
+    $('rowPhantomGross').textContent = fmtMoney(r.phantomGross,2);
+    $('rowPhantomTax').textContent = '-' + fmtMoney(r.phantomTaxAmt,2);
+    $('rowPhantomNet').textContent = fmtMoney(r.phantomNet,2);
+
+    $('rowEarnoutGross').textContent = fmtMoney(r.earnoutGross,2);
+    $('rowEarnoutTax').textContent = '-' + fmtMoney(r.earnoutTaxAmt,2);
+    $('rowEarnoutNet').textContent = fmtMoney(r.earnoutNet,2);
+
+    const totalGross = r.equityGross + r.phantomGross + r.earnoutGross;
+    const totalTax = r.equityTaxAmt + r.phantomTaxAmt + r.earnoutTaxAmt;
+    $('rowTotalGross').textContent = fmtMoney(totalGross,2);
+    $('rowTotalTax').textContent = '-' + fmtMoney(totalTax,2);
+    $('rowTotalNet').textContent = fmtMoney(r.net,2);
+
+    const upfrontPct = r.net > 0 ? (r.upfront/r.net*100) : 100;
+    const deferredPct = 100 - upfrontPct;
+    const bar = $('splitBar');
+    bar.innerHTML = '';
+    if(deferredPct > 0.5){
+      bar.innerHTML = `<div class="split-upfront" style="width:${upfrontPct}%">${upfrontPct.toFixed(0)}%</div><div class="split-deferred" style="width:${deferredPct}%">${deferredPct.toFixed(0)}%</div>`;
+    } else {
+      bar.innerHTML = `<div class="split-upfront" style="width:100%">100% al cierre</div>`;
+    }
+    $('upfrontLegend').textContent = fmtMoney(r.upfront,2);
+    $('deferredLegend').textContent = r.deferred > 0 ? fmtMoney(r.deferred,2) + ` (${s.earnoutYears} años)` : '0 €';
+
+    $('restoAmountDisplay').textContent = fmtMoney(r.restoAmount,2);
+    $('blendedRateVal').textContent = r.blendedRate.toFixed(2).replace(/\.?0+$/,'') + '%';
+
+    $('outMonthly').textContent = fmtMoney(s.withdrawal,1);
+    $('outAnnual').textContent = fmtMoney(s.withdrawal*12,2);
+
+    const finalBalance = r.yearly[r.yearly.length-1];
+    $('outFinalBalance').textContent = fmtMoney(finalBalance,2);
+
+    const badge = $('outBadge');
+    const footnote = $('chartFootnote');
+    if(r.depletionYear !== null){
+      badge.innerHTML = '<span class="badge critical">⚠ Capital agotado</span>';
+      footnote.textContent = `Con un retiro de ${fmtMoney(s.withdrawal,1)}/mes, el capital se agota en el año ${r.depletionYear.toFixed(1)}. Retiro sostenible indefinido con esta cartera: ${fmtMoney(r.sustainableMonthly,1)}/mes.`;
+    } else if(finalBalance < r.upfront + r.deferred){
+      badge.innerHTML = '<span class="badge warning">◐ Capital decrece</span>';
+      footnote.textContent = `El capital aguanta los ${s.years} años pero decrece frente al total invertido. Retiro sostenible indefinido: ${fmtMoney(r.sustainableMonthly,1)}/mes.`;
+    } else {
+      badge.innerHTML = '<span class="badge good">✓ Sostenible, crece</span>';
+      footnote.textContent = `Con este retiro el capital crece durante los ${s.years} años proyectados.`;
+    }
+
+    renderChart(r.yearly, r.depletionYear, s.years);
+  }
+
+  Object.values(inputs).forEach(el => {
+    el.addEventListener('input', update);
+  });
+
+  document.querySelectorAll('#tab-single .stepbtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = inputs[btn.dataset.step];
+      const dir = parseInt(btn.dataset.dir,10);
+      const current = parseFloat(target.value) || 0;
+      target.value = Math.max(0, current + dir*1);
+      update();
+    });
+  });
+
+  window.addEventListener('resize', update);
+  update();
+
+  // ======================================================================
+  // TAB 2: VENTA POR ETAPAS
+  // ======================================================================
+  const stInputs = {
+    st1_mrr: $('st1_mrr'), st1_multiple: $('st1_multiple'), st1_equityPct: $('st1_equityPct'), st1_equityTax: $('st1_equityTax'),
+    st2_mrr: $('st2_mrr'), st2_multiple: $('st2_multiple'), st2_equityPct: $('st2_equityPct'), st2_equityTax: $('st2_equityTax'),
+    st2_phantomPct: $('st2_phantomPct'), st2_phantomTax: $('st2_phantomTax'),
+    earnoutTotalM: $('earnoutTotalM'), st2_earnoutPct: $('st2_earnoutPct'), st2_earnoutTax: $('st2_earnoutTax'),
+    st3_mrr: $('st3_mrr'), st3_multiple: $('st3_multiple'), st3_equityPct: $('st3_equityPct'), st3_equityTax: $('st3_equityTax'),
+    st3_phantomPct: $('st3_phantomPct'), st3_phantomTax: $('st3_phantomTax'),
+    st3_earnoutPct: $('st3_earnoutPct'), st3_earnoutTax: $('st3_earnoutTax')
+  };
+
+  function calcStage(mrr, multiple, equityPct, equityTax, phantomPct, phantomTax, earnoutTotalM, earnoutStagePct, earnoutTax){
+    const arr = mrr * 12;
+    const valuation = arr * multiple;
+    const equityGross = valuation * (equityPct/100);
+    const equityNet = equityGross * (1 - equityTax/100);
+    const phantomGross = valuation * (phantomPct/100);
+    const phantomNet = phantomGross * (1 - phantomTax/100);
+    const earnoutGross = earnoutTotalM * 1e6 * (earnoutStagePct/100);
+    const earnoutNet = earnoutGross * (1 - earnoutTax/100);
+    const total = equityNet + phantomNet + earnoutNet;
+    return { arr, valuation, equityGross, equityNet, phantomGross, phantomNet, earnoutGross, earnoutNet, total };
+  }
+
+  function renderStagedChart(totals){
+    const svg = $('stagedChart');
+    svg.innerHTML = '';
+    const W = 640, H = 200, padL = 30, padR = 30, padT = 20, padB = 26;
+    const max = Math.max(...totals, 1);
+    const n = totals.length;
+    const bandW = (W - padL - padR) / n;
+    const barW = bandW * 0.5;
+
+    const ns = 'http://www.w3.org/2000/svg';
+    const mk = (tag, attrs) => {
+      const el = document.createElementNS(ns, tag);
+      for(const k in attrs) el.setAttribute(k, attrs[k]);
+      return el;
+    };
+
+    const y = v => padT + (H - padT - padB) * (1 - v/max);
+    svg.appendChild(mk('line', {x1:padL, x2:W-padR, y1:y(0), y2:y(0), stroke:'var(--baseline)', 'stroke-width':1}));
+
+    const tooltip = $('stagedTooltip');
+    const labels = ['Etapa 1','Etapa 2','Etapa 3'];
+
+    totals.forEach((val, i) => {
+      const cx = padL + bandW*i + bandW/2;
+      const barX = cx - barW/2;
+      const barY = y(val);
+      const barH = y(0) - barY;
+      const rect = mk('rect', {x:barX, y:barY, width:barW, height: Math.max(barH,1), rx:4, fill:'var(--series-1)', opacity: 0.55 + i*0.15});
+      svg.appendChild(rect);
+
+      const lbl = mk('text', {x:cx, y:barY-8, 'text-anchor':'middle', fill:'var(--text-primary)', 'font-size':12, 'font-weight':700});
+      lbl.textContent = fmtMoney(val,1);
+      svg.appendChild(lbl);
+
+      const xlbl = mk('text', {x:cx, y:H-6, 'text-anchor':'middle', fill:'var(--text-muted)', 'font-size':11});
+      xlbl.textContent = labels[i];
+      svg.appendChild(xlbl);
+
+      const hit = mk('rect', {x:padL+bandW*i, y:0, width:bandW, height:H, fill:'transparent'});
+      hit.addEventListener('mousemove', (e) => {
+        const rect2 = svg.getBoundingClientRect();
+        tooltip.style.left = ((cx/W) * rect2.width) + 'px';
+        tooltip.style.top = ((barY/H) * rect2.height) + 'px';
+        tooltip.innerHTML = labels[i] + ': <b>' + fmtMoney(val,2) + '</b>';
+        tooltip.style.opacity = 1;
+      });
+      hit.addEventListener('mouseleave', () => { tooltip.style.opacity = 0; });
+      svg.appendChild(hit);
+    });
+  }
+
+  function stagedUpdate(){
+    const mrr1 = parseThousands(stInputs.st1_mrr.value);
+    const mult1 = parseFloat(stInputs.st1_multiple.value);
+    const eq1Pct = parseFloat(stInputs.st1_equityPct.value);
+    const eq1Tax = parseFloat(stInputs.st1_equityTax.value);
+
+    const mrr2 = parseThousands(stInputs.st2_mrr.value);
+    const mult2 = parseFloat(stInputs.st2_multiple.value);
+    const eq2Pct = parseFloat(stInputs.st2_equityPct.value);
+    const eq2Tax = parseFloat(stInputs.st2_equityTax.value);
+    const ph2Pct = parseFloat(stInputs.st2_phantomPct.value);
+    const ph2Tax = parseFloat(stInputs.st2_phantomTax.value);
+
+    const earnoutTotalM = parseFloat(stInputs.earnoutTotalM.value) || 0;
+    const eo2Pct = parseFloat(stInputs.st2_earnoutPct.value);
+    const eo2Tax = parseFloat(stInputs.st2_earnoutTax.value);
+
+    const mrr3 = parseThousands(stInputs.st3_mrr.value);
+    const mult3 = parseFloat(stInputs.st3_multiple.value);
+    const eq3Pct = parseFloat(stInputs.st3_equityPct.value);
+    const eq3Tax = parseFloat(stInputs.st3_equityTax.value);
+    const ph3Pct = parseFloat(stInputs.st3_phantomPct.value);
+    const ph3Tax = parseFloat(stInputs.st3_phantomTax.value);
+    const eo3Pct = parseFloat(stInputs.st3_earnoutPct.value);
+    const eo3Tax = parseFloat(stInputs.st3_earnoutTax.value);
+
+    $('st1_mrrDisplay').textContent = fmtMoney(mrr1,1);
+    $('st1_multipleVal').textContent = mult1.toFixed(1) + '×';
+    $('st1_equityPctVal').textContent = eq1Pct + '%';
+    $('st1_equityTaxVal').textContent = eq1Tax.toFixed(2).replace(/\.?0+$/,'') + '%';
+
+    $('st2_mrrDisplay').textContent = fmtMoney(mrr2,1);
+    $('st2_multipleVal').textContent = mult2.toFixed(1) + '×';
+    $('st2_equityPctVal').textContent = eq2Pct + '%';
+    $('st2_equityTaxVal').textContent = eq2Tax.toFixed(2).replace(/\.?0+$/,'') + '%';
+    $('st2_phantomPctVal').textContent = ph2Pct + '%';
+    $('st2_phantomTaxVal').textContent = ph2Tax + '%';
+    $('earnoutTotalMVal').textContent = earnoutTotalM + 'M €';
+    $('st2_earnoutPctVal').textContent = eo2Pct + '%';
+    $('st2_earnoutTaxVal').textContent = eo2Tax + '%';
+
+    $('st3_mrrDisplay').textContent = fmtMoney(mrr3,1);
+    $('st3_multipleVal').textContent = mult3.toFixed(1) + '×';
+    $('st3_equityPctVal').textContent = eq3Pct + '%';
+    $('st3_equityTaxVal').textContent = eq3Tax.toFixed(2).replace(/\.?0+$/,'') + '%';
+    $('st3_phantomPctVal').textContent = ph3Pct + '%';
+    $('st3_phantomTaxVal').textContent = ph3Tax + '%';
+    $('st3_earnoutPctVal').textContent = eo3Pct + '%';
+    $('st3_earnoutTaxVal').textContent = eo3Tax + '%';
+
+    const split = eo2Pct + eo3Pct;
+    const splitEl = $('earnoutSplitCheck');
+    splitEl.textContent = split + '% del pool (ideal 100%)';
+    splitEl.style.color = Math.abs(split-100) < 0.01 ? 'var(--good)' : 'var(--warning)';
+
+    const r1 = calcStage(mrr1, mult1, eq1Pct, eq1Tax, 0, 0, 0, 0, 0);
+    const r2 = calcStage(mrr2, mult2, eq2Pct, eq2Tax, ph2Pct, ph2Tax, earnoutTotalM, eo2Pct, eo2Tax);
+    const r3 = calcStage(mrr3, mult3, eq3Pct, eq3Tax, ph3Pct, ph3Tax, earnoutTotalM, eo3Pct, eo3Tax);
+
+    const grand = r1.total + r2.total + r3.total;
+    $('stagedGrandTotal').textContent = fmtMoney(grand,2);
+    $('stagedTotal1').textContent = fmtMoney(r1.total,2);
+    $('stagedTotal2').textContent = fmtMoney(r2.total,2);
+    $('stagedTotal3').textContent = fmtMoney(r3.total,2);
+
+    $('st1_rowEquity').textContent = fmtMoney(r1.equityNet,2);
+    $('st1_rowPhantom').textContent = fmtMoney(r1.phantomNet,2);
+    $('st1_rowEarnout').textContent = fmtMoney(r1.earnoutNet,2);
+    $('st1_rowTotal').textContent = fmtMoney(r1.total,2);
+
+    $('st2_rowEquity').textContent = fmtMoney(r2.equityNet,2);
+    $('st2_rowPhantom').textContent = fmtMoney(r2.phantomNet,2);
+    $('st2_rowEarnout').textContent = fmtMoney(r2.earnoutNet,2);
+    $('st2_rowTotal').textContent = fmtMoney(r2.total,2);
+
+    $('st3_rowEquity').textContent = fmtMoney(r3.equityNet,2);
+    $('st3_rowPhantom').textContent = fmtMoney(r3.phantomNet,2);
+    $('st3_rowEarnout').textContent = fmtMoney(r3.earnoutNet,2);
+    $('st3_rowTotal').textContent = fmtMoney(r3.total,2);
+
+    $('stg_rowEquity').textContent = fmtMoney(r1.equityNet+r2.equityNet+r3.equityNet,2);
+    $('stg_rowPhantom').textContent = fmtMoney(r1.phantomNet+r2.phantomNet+r3.phantomNet,2);
+    $('stg_rowEarnout').textContent = fmtMoney(r1.earnoutNet+r2.earnoutNet+r3.earnoutNet,2);
+    $('stg_rowTotal').textContent = fmtMoney(grand,2);
+
+    renderStagedChart([r1.total, r2.total, r3.total]);
+  }
+
+  Object.values(stInputs).forEach(el => {
+    el.addEventListener('input', stagedUpdate);
+  });
+  window.addEventListener('resize', stagedUpdate);
+  stagedUpdate();
+})();
+</script>
