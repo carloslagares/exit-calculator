@@ -263,6 +263,7 @@
     <div class="tabs">
       <button class="tab-btn active" data-tab="staged">Venta por etapas</button>
       <button class="tab-btn" data-tab="single">Venta única</button>
+      <button class="reset-btn" id="floorBtn">📉 Floor</button>
       <button class="reset-btn" id="resetBtn">↺ Reset</button>
     </div>
 
@@ -1053,6 +1054,18 @@
     Object.values(stInputs).forEach(el => { el.value = el.defaultValue; });
     update();
     stagedUpdate();
+  });
+
+  // ---------- FLOOR SCENARIO ----------
+  const FLOOR_PRESET = {
+    st1_mrr: '600', st1_multiple: '5', st1_equityPct: '24', earnoutTotalM: '0',
+    st2_mrr: '600', st2_equityPct: '6', st2_phantomPct: '5',
+    st3_mrr: '600', st3_equityPct: '6', st3_phantomPct: '5'
+  };
+  $('floorBtn').addEventListener('click', () => {
+    Object.entries(FLOOR_PRESET).forEach(([id, val]) => { stInputs[id].value = val; });
+    stagedUpdate();
+    document.querySelector('.tab-btn[data-tab="staged"]').click();
   });
 })();
 </script>
