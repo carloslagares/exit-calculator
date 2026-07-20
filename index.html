@@ -470,7 +470,6 @@
             <div class="field">
               <div class="field-label"><span>Equity vendido</span><span class="field-value" id="st1_equityPctVal">25%</span></div>
               <input type="range" id="st1_equityPct" min="0" max="100" step="1" value="25">
-              <div class="field-hint">Tributa siempre al 1.25% (fijo).</div>
             </div>
             <div class="divider"></div>
             <div class="field">
@@ -479,12 +478,7 @@
                 <input type="text" id="earnoutTotalM" inputmode="numeric" value="10">
                 <span class="suffix">M €</span>
               </div>
-              <div class="field-hint">Pool total del earn-out, repartido entre etapa 2 y 3. Tributa siempre al 0% (fijo).</div>
-            </div>
-            <div class="field">
-              <div class="field-label"><span>% earn-out entregado en etapa 2</span><span class="field-value" id="st2_earnoutPctVal">50%</span></div>
-              <input type="range" id="st2_earnoutPct" min="0" max="100" step="5" value="50">
-              <div class="field-hint">El resto (<b id="st3_earnoutPctVal">50%</b>) se entrega en etapa 3.</div>
+              <div class="field-hint">Se reparte 50% / 50% entre etapa 2 y 3, automáticamente.</div>
             </div>
           </div>
 
@@ -885,7 +879,7 @@
   // ======================================================================
   const stInputs = {
     st1_mrr: $('st1_mrr'), st1_multiple: $('st1_multiple'), st1_equityPct: $('st1_equityPct'),
-    earnoutTotalM: $('earnoutTotalM'), st2_earnoutPct: $('st2_earnoutPct'),
+    earnoutTotalM: $('earnoutTotalM'),
     st2_mrr: $('st2_mrr'), st2_equityPct: $('st2_equityPct'), st2_phantomPct: $('st2_phantomPct'),
     st3_mrr: $('st3_mrr'), st3_equityPct: $('st3_equityPct'), st3_phantomPct: $('st3_phantomPct')
   };
@@ -964,8 +958,8 @@
     const eq1Pct = parseFloat(stInputs.st1_equityPct.value);
 
     const earnoutTotalM = parseFloat(stInputs.earnoutTotalM.value) || 0;
-    const eo2Pct = parseFloat(stInputs.st2_earnoutPct.value);
-    const eo3Pct = 100 - eo2Pct;
+    const eo2Pct = 50;
+    const eo3Pct = 50;
 
     const mrr2 = parseThousands(stInputs.st2_mrr.value);
     const eq2Pct = parseFloat(stInputs.st2_equityPct.value);
@@ -979,8 +973,6 @@
     $('st1_multipleVal').textContent = mult1.toFixed(1) + '×';
     $('st1_equityPctVal').textContent = eq1Pct + '%';
     $('earnoutTotalMVal').textContent = earnoutTotalM + 'M €';
-    $('st2_earnoutPctVal').textContent = eo2Pct + '%';
-    $('st3_earnoutPctVal').textContent = eo3Pct + '%';
 
     $('st2_mrrDisplay').textContent = fmtMoney(mrr2,1);
     $('st2_equityPctVal').textContent = eq2Pct + '%';
