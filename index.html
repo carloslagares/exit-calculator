@@ -475,7 +475,7 @@
         <div class="stage-cols">
           <!-- ETAPA 1 -->
           <div class="stage-card">
-            <h3>Etapa 1</h3>
+            <h3>Etapa 1 · cierre 2026</h3>
             <div class="stage-sub">Equity + define el earn-out de toda la operación</div>
 
             <div class="field">
@@ -507,7 +507,7 @@
 
           <!-- ETAPA 2 -->
           <div class="stage-card">
-            <h3>Etapa 2</h3>
+            <h3>Etapa 2 · cierre 2027</h3>
             <div class="stage-sub">Equity + phantom + 1ª mitad earn-out</div>
 
             <div class="field">
@@ -531,7 +531,7 @@
 
           <!-- ETAPA 3 -->
           <div class="stage-card">
-            <h3>Etapa 3</h3>
+            <h3>Etapa 3 · cierre 2028</h3>
             <div class="stage-sub">Equity + phantom + 2ª mitad earn-out</div>
 
             <div class="field">
@@ -565,15 +565,15 @@
 
         <div class="stage-total-row">
           <div class="stage-total">
-            <div class="stage-total-label">Etapa 1</div>
+            <div class="stage-total-label">Etapa 1 · 2026</div>
             <div class="stage-total-value" id="stagedTotal1">—</div>
           </div>
           <div class="stage-total">
-            <div class="stage-total-label">Etapa 2</div>
+            <div class="stage-total-label">Etapa 2 · 2027</div>
             <div class="stage-total-value" id="stagedTotal2">—</div>
           </div>
           <div class="stage-total">
-            <div class="stage-total-label">Etapa 3</div>
+            <div class="stage-total-label">Etapa 3 · 2028</div>
             <div class="stage-total-value" id="stagedTotal3">—</div>
           </div>
         </div>
@@ -588,9 +588,9 @@
         <table class="breakdown">
           <thead><tr><th>Etapa</th><th>Equity neto</th><th>Phantom neto</th><th>Earn-out neto</th><th>Total</th></tr></thead>
           <tbody>
-            <tr><td class="label">Etapa 1</td><td id="st1_rowEquity">—</td><td id="st1_rowPhantom">—</td><td id="st1_rowEarnout">—</td><td class="net" id="st1_rowTotal">—</td></tr>
-            <tr><td class="label">Etapa 2</td><td id="st2_rowEquity">—</td><td id="st2_rowPhantom">—</td><td id="st2_rowEarnout">—</td><td class="net" id="st2_rowTotal">—</td></tr>
-            <tr><td class="label">Etapa 3</td><td id="st3_rowEquity">—</td><td id="st3_rowPhantom">—</td><td id="st3_rowEarnout">—</td><td class="net" id="st3_rowTotal">—</td></tr>
+            <tr><td class="label">Etapa 1 (2026)</td><td id="st1_rowEquity">—</td><td id="st1_rowPhantom">—</td><td id="st1_rowEarnout">—</td><td class="net" id="st1_rowTotal">—</td></tr>
+            <tr><td class="label">Etapa 2 (2027)</td><td id="st2_rowEquity">—</td><td id="st2_rowPhantom">—</td><td id="st2_rowEarnout">—</td><td class="net" id="st2_rowTotal">—</td></tr>
+            <tr><td class="label">Etapa 3 (2028)</td><td id="st3_rowEquity">—</td><td id="st3_rowPhantom">—</td><td id="st3_rowEarnout">—</td><td class="net" id="st3_rowTotal">—</td></tr>
             <tr><td class="label">Total</td><td id="stg_rowEquity">—</td><td id="stg_rowPhantom">—</td><td id="stg_rowEarnout">—</td><td class="net" id="stg_rowTotal">—</td></tr>
           </tbody>
         </table>
@@ -951,7 +951,7 @@
 
     const shades = ['var(--stage-1)','var(--stage-2)','var(--stage-3)'];
     const tooltip = $('stagedTooltip');
-    const labels = ['Etapa 1','Etapa 2','Etapa 3'];
+    const labels = ['Etapa 1 · 26','Etapa 2 · 27','Etapa 3 · 28'];
 
     totals.forEach((val, i) => {
       const cx = padL + bandW*i + bandW/2;
