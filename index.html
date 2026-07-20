@@ -96,7 +96,7 @@
   .hero h1 { font-size: 2.1rem; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.02em; }
   .hero p { margin: 0 0 20px; color: var(--text-secondary); font-size: 0.98rem; }
 
-  .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--grid); }
+  .tabs { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--grid); }
   .tab-btn {
     font-family: inherit; font-size: 0.88rem; font-weight: 700; color: var(--text-muted);
     background: none; border: none; padding: 10px 4px; margin-right: 20px; cursor: pointer;
@@ -104,6 +104,12 @@
   }
   .tab-btn:hover { color: var(--text-primary); }
   .tab-btn.active { color: var(--series-1); border-bottom-color: var(--series-1); }
+  .reset-btn {
+    font-family: inherit; font-size: 0.82rem; font-weight: 700; color: var(--text-secondary);
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 14px; cursor: pointer; margin-left: auto; margin-bottom: 8px;
+  }
+  .reset-btn:hover { color: var(--series-1); border-color: var(--series-1); }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
 
@@ -255,12 +261,13 @@
     </div>
 
     <div class="tabs">
-      <button class="tab-btn active" data-tab="single">Venta única</button>
-      <button class="tab-btn" data-tab="staged">Venta por etapas</button>
+      <button class="tab-btn active" data-tab="staged">Venta por etapas</button>
+      <button class="tab-btn" data-tab="single">Venta única</button>
+      <button class="reset-btn" id="resetBtn">↺ Reset</button>
     </div>
 
     <!-- ======================= TAB 1: VENTA ÚNICA ======================= -->
-    <div class="tab-panel active" id="tab-single">
+    <div class="tab-panel" id="tab-single">
     <div class="grid">
       <!-- INPUTS -->
       <div class="col">
@@ -456,7 +463,7 @@
     </div>
 
     <!-- ======================= TAB 2: VENTA POR ETAPAS ======================= -->
-    <div class="tab-panel" id="tab-staged">
+    <div class="tab-panel active" id="tab-staged">
       <div class="card" style="margin-bottom:20px;">
         <h2>Etapas de la operación</h2>
         <div class="card-sub">3 momentos de venta independientes. Cada uno con su propio MRR, multiple e impuestos. Todo editable.</div>
@@ -1039,5 +1046,13 @@
   });
   window.addEventListener('resize', stagedUpdate);
   stagedUpdate();
+
+  // ---------- RESET ----------
+  $('resetBtn').addEventListener('click', () => {
+    Object.values(inputs).forEach(el => { el.value = el.defaultValue; });
+    Object.values(stInputs).forEach(el => { el.value = el.defaultValue; });
+    update();
+    stagedUpdate();
+  });
 })();
 </script>
