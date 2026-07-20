@@ -211,7 +211,7 @@
   .badge.critical { color: var(--critical); background: var(--critical-bg); }
 
   .chart-wrap { position: relative; margin-top: 6px; }
-  svg.chart { width: 100%; height: 230px; overflow: visible; display: block; }
+  svg.chart { width: 100%; height: auto; overflow: visible; display: block; }
   .chart-tooltip {
     position: absolute; pointer-events: none; background: var(--text-primary); color: var(--surface-1);
     font-size: 0.74rem; font-weight: 600; padding: 6px 10px; border-radius: 8px; transform: translate(-50%,-115%);
@@ -434,7 +434,7 @@
             </div>
           </div>
           <div class="chart-wrap">
-            <svg class="chart" id="chart" viewBox="0 0 640 230" preserveAspectRatio="none"></svg>
+            <svg class="chart" id="chart" viewBox="0 0 640 230" style="aspect-ratio: 640 / 230;"></svg>
             <div class="chart-tooltip" id="tooltip"></div>
           </div>
           <div class="foot-note" id="chartFootnote"></div>
@@ -453,7 +453,7 @@
           <!-- ETAPA 1 -->
           <div class="stage-card">
             <h3>Etapa 1</h3>
-            <div class="stage-sub">Solo equity, sin earn-out</div>
+            <div class="stage-sub">Equity + define el earn-out de toda la operación</div>
 
             <div class="field">
               <div class="field-label"><span>MRR</span><span class="field-value" id="st1_mrrDisplay">—</span></div>
@@ -471,6 +471,20 @@
               <div class="field-label"><span>Equity vendido</span><span class="field-value" id="st1_equityPctVal">25%</span></div>
               <input type="range" id="st1_equityPct" min="0" max="100" step="1" value="25">
               <div class="field-hint">Tributa siempre al 1.25% (fijo).</div>
+            </div>
+            <div class="divider"></div>
+            <div class="field">
+              <div class="field-label"><span>Earn-out total operación</span><span class="field-value" id="earnoutTotalMVal">10M €</span></div>
+              <div class="numfield">
+                <input type="text" id="earnoutTotalM" inputmode="numeric" value="10">
+                <span class="suffix">M €</span>
+              </div>
+              <div class="field-hint">Pool total del earn-out, repartido entre etapa 2 y 3. Tributa siempre al 0% (fijo).</div>
+            </div>
+            <div class="field">
+              <div class="field-label"><span>% earn-out entregado en etapa 2</span><span class="field-value" id="st2_earnoutPctVal">50%</span></div>
+              <input type="range" id="st2_earnoutPct" min="0" max="100" step="5" value="50">
+              <div class="field-hint">El resto (<b id="st3_earnoutPctVal">50%</b>) se entrega en etapa 3.</div>
             </div>
           </div>
 
@@ -494,23 +508,7 @@
             <div class="field">
               <div class="field-label"><span>Phantom vendido</span><span class="field-value" id="st2_phantomPctVal">7%</span></div>
               <input type="range" id="st2_phantomPct" min="0" max="100" step="1" value="7">
-            </div>
-            <div class="field">
-              <div class="field-label"><span>Tributación phantom</span><span class="field-value" id="st2_phantomTaxVal">0%</span></div>
-              <input type="range" id="st2_phantomTax" min="0" max="55" step="1" value="0">
-            </div>
-            <div class="divider"></div>
-            <div class="field">
-              <div class="field-label"><span>Earn-out total operación</span><span class="field-value" id="earnoutTotalMVal">10M €</span></div>
-              <div class="numfield">
-                <input type="text" id="earnoutTotalM" inputmode="numeric" value="10">
-                <span class="suffix">M €</span>
-              </div>
-              <div class="field-hint">Pool total del earn-out, repartido entre etapa 2 y 3. Tributa siempre al 0% (fijo).</div>
-            </div>
-            <div class="field">
-              <div class="field-label"><span>% del earn-out entregado aquí</span><span class="field-value" id="st2_earnoutPctVal">50%</span></div>
-              <input type="range" id="st2_earnoutPct" min="0" max="100" step="5" value="50">
+              <div class="field-hint">Tributa siempre al 0% (fijo).</div>
             </div>
           </div>
 
@@ -534,16 +532,7 @@
             <div class="field">
               <div class="field-label"><span>Phantom vendido</span><span class="field-value" id="st3_phantomPctVal">8%</span></div>
               <input type="range" id="st3_phantomPct" min="0" max="100" step="1" value="8">
-            </div>
-            <div class="field">
-              <div class="field-label"><span>Tributación phantom</span><span class="field-value" id="st3_phantomTaxVal">0%</span></div>
-              <input type="range" id="st3_phantomTax" min="0" max="55" step="1" value="0">
-            </div>
-            <div class="divider"></div>
-            <div class="field">
-              <div class="field-label"><span>% del earn-out entregado aquí</span><span class="field-value" id="st3_earnoutPctVal">50%</span></div>
-              <input type="range" id="st3_earnoutPct" min="0" max="100" step="5" value="50">
-              <div class="field-hint">Repartido: <b id="earnoutSplitCheck">—</b> · tributa siempre al 0% (fijo).</div>
+              <div class="field-hint">Tributa siempre al 0% (fijo).</div>
             </div>
           </div>
         </div>
@@ -573,7 +562,7 @@
         </div>
 
         <div class="chart-wrap" style="margin-top:22px;">
-          <svg class="chart" id="stagedChart" viewBox="0 0 640 200" preserveAspectRatio="none"></svg>
+          <svg class="chart" id="stagedChart" viewBox="0 0 640 200" style="aspect-ratio: 640 / 200;"></svg>
           <div class="chart-tooltip" id="stagedTooltip"></div>
         </div>
 
@@ -896,16 +885,14 @@
   // ======================================================================
   const stInputs = {
     st1_mrr: $('st1_mrr'), st1_multiple: $('st1_multiple'), st1_equityPct: $('st1_equityPct'),
-    st2_mrr: $('st2_mrr'), st2_equityPct: $('st2_equityPct'),
-    st2_phantomPct: $('st2_phantomPct'), st2_phantomTax: $('st2_phantomTax'),
     earnoutTotalM: $('earnoutTotalM'), st2_earnoutPct: $('st2_earnoutPct'),
-    st3_mrr: $('st3_mrr'), st3_equityPct: $('st3_equityPct'),
-    st3_phantomPct: $('st3_phantomPct'), st3_phantomTax: $('st3_phantomTax'),
-    st3_earnoutPct: $('st3_earnoutPct')
+    st2_mrr: $('st2_mrr'), st2_equityPct: $('st2_equityPct'), st2_phantomPct: $('st2_phantomPct'),
+    st3_mrr: $('st3_mrr'), st3_equityPct: $('st3_equityPct'), st3_phantomPct: $('st3_phantomPct')
   };
 
   const EQUITY_TAX_FIXED = 1.25;
   const EARNOUT_TAX_FIXED = 0;
+  const PHANTOM_TAX_FIXED = 0;
 
   function calcStage(mrr, multiple, equityPct, equityTax, phantomPct, phantomTax, earnoutTotalM, earnoutStagePct, earnoutTax){
     const arr = mrr * 12;
@@ -976,45 +963,36 @@
     const mult1 = parseFloat(stInputs.st1_multiple.value);
     const eq1Pct = parseFloat(stInputs.st1_equityPct.value);
 
+    const earnoutTotalM = parseFloat(stInputs.earnoutTotalM.value) || 0;
+    const eo2Pct = parseFloat(stInputs.st2_earnoutPct.value);
+    const eo3Pct = 100 - eo2Pct;
+
     const mrr2 = parseThousands(stInputs.st2_mrr.value);
     const eq2Pct = parseFloat(stInputs.st2_equityPct.value);
     const ph2Pct = parseFloat(stInputs.st2_phantomPct.value);
-    const ph2Tax = parseFloat(stInputs.st2_phantomTax.value);
-
-    const earnoutTotalM = parseFloat(stInputs.earnoutTotalM.value) || 0;
-    const eo2Pct = parseFloat(stInputs.st2_earnoutPct.value);
 
     const mrr3 = parseThousands(stInputs.st3_mrr.value);
     const eq3Pct = parseFloat(stInputs.st3_equityPct.value);
     const ph3Pct = parseFloat(stInputs.st3_phantomPct.value);
-    const ph3Tax = parseFloat(stInputs.st3_phantomTax.value);
-    const eo3Pct = parseFloat(stInputs.st3_earnoutPct.value);
 
     $('st1_mrrDisplay').textContent = fmtMoney(mrr1,1);
     $('st1_multipleVal').textContent = mult1.toFixed(1) + '×';
     $('st1_equityPctVal').textContent = eq1Pct + '%';
+    $('earnoutTotalMVal').textContent = earnoutTotalM + 'M €';
+    $('st2_earnoutPctVal').textContent = eo2Pct + '%';
+    $('st3_earnoutPctVal').textContent = eo3Pct + '%';
 
     $('st2_mrrDisplay').textContent = fmtMoney(mrr2,1);
     $('st2_equityPctVal').textContent = eq2Pct + '%';
     $('st2_phantomPctVal').textContent = ph2Pct + '%';
-    $('st2_phantomTaxVal').textContent = ph2Tax + '%';
-    $('earnoutTotalMVal').textContent = earnoutTotalM + 'M €';
-    $('st2_earnoutPctVal').textContent = eo2Pct + '%';
 
     $('st3_mrrDisplay').textContent = fmtMoney(mrr3,1);
     $('st3_equityPctVal').textContent = eq3Pct + '%';
     $('st3_phantomPctVal').textContent = ph3Pct + '%';
-    $('st3_phantomTaxVal').textContent = ph3Tax + '%';
-    $('st3_earnoutPctVal').textContent = eo3Pct + '%';
-
-    const split = eo2Pct + eo3Pct;
-    const splitEl = $('earnoutSplitCheck');
-    splitEl.textContent = split + '% del pool (ideal 100%)';
-    splitEl.style.color = Math.abs(split-100) < 0.01 ? 'var(--good)' : 'var(--warning)';
 
     const r1 = calcStage(mrr1, mult1, eq1Pct, EQUITY_TAX_FIXED, 0, 0, 0, 0, 0);
-    const r2 = calcStage(mrr2, mult1, eq2Pct, EQUITY_TAX_FIXED, ph2Pct, ph2Tax, earnoutTotalM, eo2Pct, EARNOUT_TAX_FIXED);
-    const r3 = calcStage(mrr3, mult1, eq3Pct, EQUITY_TAX_FIXED, ph3Pct, ph3Tax, earnoutTotalM, eo3Pct, EARNOUT_TAX_FIXED);
+    const r2 = calcStage(mrr2, mult1, eq2Pct, EQUITY_TAX_FIXED, ph2Pct, PHANTOM_TAX_FIXED, earnoutTotalM, eo2Pct, EARNOUT_TAX_FIXED);
+    const r3 = calcStage(mrr3, mult1, eq3Pct, EQUITY_TAX_FIXED, ph3Pct, PHANTOM_TAX_FIXED, earnoutTotalM, eo3Pct, EARNOUT_TAX_FIXED);
 
     const grand = r1.total + r2.total + r3.total;
     $('stagedGrandTotal').textContent = fmtMoney(grand,2);
