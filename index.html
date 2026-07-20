@@ -104,10 +104,11 @@
   }
   .tab-btn:hover { color: var(--text-primary); }
   .tab-btn.active { color: var(--series-1); border-bottom-color: var(--series-1); }
+  .tab-actions { display: flex; gap: 8px; margin-left: auto; flex-shrink: 0; }
   .reset-btn {
     font-family: inherit; font-size: 0.82rem; font-weight: 700; color: var(--text-secondary);
     background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
-    padding: 7px 14px; cursor: pointer; margin-left: auto; margin-bottom: 8px;
+    padding: 7px 14px; cursor: pointer; margin-bottom: 8px; white-space: nowrap;
   }
   .reset-btn:hover { color: var(--series-1); border-color: var(--series-1); }
   .tab-panel { display: none; }
@@ -263,8 +264,10 @@
     <div class="tabs">
       <button class="tab-btn active" data-tab="staged">Venta por etapas</button>
       <button class="tab-btn" data-tab="single">Venta única</button>
-      <button class="reset-btn" id="floorBtn">📉 Floor</button>
-      <button class="reset-btn" id="resetBtn">↺ Reset</button>
+      <div class="tab-actions">
+        <button class="reset-btn" id="floorBtn">📉 Floor</button>
+        <button class="reset-btn" id="resetBtn">↺ Reset</button>
+      </div>
     </div>
 
     <!-- ======================= TAB 1: VENTA ÚNICA ======================= -->
