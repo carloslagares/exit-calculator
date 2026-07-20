@@ -11,6 +11,9 @@
     --border:         rgba(11,11,11,0.10);
     --series-1:       #2a78d6;
     --series-1-soft:  rgba(42,120,214,0.14);
+    --stage-1:        #86b6ef;
+    --stage-2:        #2a78d6;
+    --stage-3:        #184f95;
     --good:           #0ca30c;
     --warning:        #b8790f;
     --warning-bg:     #fab21922;
@@ -30,6 +33,9 @@
       --border:         rgba(255,255,255,0.10);
       --series-1:       #3987e5;
       --series-1-soft:  rgba(57,135,229,0.18);
+      --stage-1:        #5598e7;
+      --stage-2:        #3987e5;
+      --stage-3:        #184f95;
       --good:           #0ca30c;
       --warning:        #fab219;
       --warning-bg:     #fab21922;
@@ -48,6 +54,9 @@
     --border:         rgba(255,255,255,0.10);
     --series-1:       #3987e5;
     --series-1-soft:  rgba(57,135,229,0.18);
+    --stage-1:        #5598e7;
+    --stage-2:        #3987e5;
+    --stage-3:        #184f95;
     --good:           #0ca30c;
     --warning:        #fab219;
     --warning-bg:     #fab21922;
@@ -65,6 +74,9 @@
     --border:         rgba(11,11,11,0.10);
     --series-1:       #2a78d6;
     --series-1-soft:  rgba(42,120,214,0.14);
+    --stage-1:        #86b6ef;
+    --stage-2:        #2a78d6;
+    --stage-3:        #184f95;
     --good:           #0ca30c;
     --warning:        #b8790f;
     --warning-bg:     #fab21922;
@@ -555,8 +567,8 @@
           </div>
         </div>
 
-        <div class="chart-wrap" style="margin-top:22px;">
-          <svg class="chart" id="stagedChart" viewBox="0 0 640 200" style="aspect-ratio: 640 / 200;"></svg>
+        <div class="chart-wrap" style="margin: 22px auto 0; max-width: 480px;">
+          <svg class="chart" id="stagedChart" viewBox="0 0 480 360" style="aspect-ratio: 480 / 360;"></svg>
           <div class="chart-tooltip" id="stagedTooltip"></div>
         </div>
 
@@ -904,11 +916,11 @@
   function renderStagedChart(totals){
     const svg = $('stagedChart');
     svg.innerHTML = '';
-    const W = 640, H = 200, padL = 30, padR = 30, padT = 20, padB = 26;
+    const W = 480, H = 360, padL = 36, padR = 20, padT = 34, padB = 34;
     const max = Math.max(...totals, 1);
     const n = totals.length;
     const bandW = (W - padL - padR) / n;
-    const barW = bandW * 0.5;
+    const barW = bandW * 0.56;
 
     const ns = 'http://www.w3.org/2000/svg';
     const mk = (tag, attrs) => {
@@ -918,8 +930,15 @@
     };
 
     const y = v => padT + (H - padT - padB) * (1 - v/max);
+
+    for(let g = 0; g <= 3; g++){
+      const gv = max * g / 3;
+      const gy = y(gv);
+      svg.appendChild(mk('line', {x1:padL, x2:W-padR, y1:gy, y2:gy, stroke:'var(--grid)', 'stroke-width':1}));
+    }
     svg.appendChild(mk('line', {x1:padL, x2:W-padR, y1:y(0), y2:y(0), stroke:'var(--baseline)', 'stroke-width':1}));
 
+    const shades = ['var(--stage-1)','var(--stage-2)','var(--stage-3)'];
     const tooltip = $('stagedTooltip');
     const labels = ['Etapa 1','Etapa 2','Etapa 3'];
 
@@ -928,14 +947,14 @@
       const barX = cx - barW/2;
       const barY = y(val);
       const barH = y(0) - barY;
-      const rect = mk('rect', {x:barX, y:barY, width:barW, height: Math.max(barH,1), rx:4, fill:'var(--series-1)', opacity: 0.55 + i*0.15});
+      const rect = mk('rect', {x:barX, y:barY, width:barW, height: Math.max(barH,2), rx:6, fill:shades[i]});
       svg.appendChild(rect);
 
-      const lbl = mk('text', {x:cx, y:barY-8, 'text-anchor':'middle', fill:'var(--text-primary)', 'font-size':12, 'font-weight':700});
+      const lbl = mk('text', {x:cx, y:barY-12, 'text-anchor':'middle', fill:'var(--text-primary)', 'font-size':16, 'font-weight':700});
       lbl.textContent = fmtMoney(val,1);
       svg.appendChild(lbl);
 
-      const xlbl = mk('text', {x:cx, y:H-6, 'text-anchor':'middle', fill:'var(--text-muted)', 'font-size':11});
+      const xlbl = mk('text', {x:cx, y:H-10, 'text-anchor':'middle', fill:'var(--text-muted)', 'font-size':13, 'font-weight':600});
       xlbl.textContent = labels[i];
       svg.appendChild(xlbl);
 
