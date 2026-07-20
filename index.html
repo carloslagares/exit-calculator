@@ -595,6 +595,47 @@
           </tbody>
         </table>
       </div>
+
+      <div class="card">
+        <h2>Coste total para el comprador</h2>
+        <div class="card-sub">Foto de toda la operación: qué paga el comprador por el 100% de la compañía, cierre a cierre. Asume que el <b id="buyerOthersPctLabel">48%</b> que no es tuyo se vende entero en el cierre de 2026, junto a tu primer tramo.</div>
+
+        <div class="hero-stat-row">
+          <div class="hero-stat">
+            <div class="hero-stat-label">Coste total operación (100%)</div>
+            <div class="hero-stat-value" id="buyerGrandTotal">—</div>
+          </div>
+        </div>
+
+        <div class="stage-total-row">
+          <div class="stage-total">
+            <div class="stage-total-label">Etapa 1 · 2026 (<span id="buyerPct1">—</span>)</div>
+            <div class="stage-total-value" id="buyerTotal1">—</div>
+          </div>
+          <div class="stage-total">
+            <div class="stage-total-label">Etapa 2 · 2027 (<span id="buyerPct2">—</span>)</div>
+            <div class="stage-total-value" id="buyerTotal2">—</div>
+          </div>
+          <div class="stage-total">
+            <div class="stage-total-label">Etapa 3 · 2028 (<span id="buyerPct3">—</span>)</div>
+            <div class="stage-total-value" id="buyerTotal3">—</div>
+          </div>
+        </div>
+
+        <div class="chart-wrap" style="margin: 22px auto 0; max-width: 480px;">
+          <svg class="chart" id="buyerChart" viewBox="0 0 480 360" style="aspect-ratio: 480 / 360;"></svg>
+          <div class="chart-tooltip" id="buyerTooltip"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="split-bar" id="buyerOwnershipBar"></div>
+        <div class="legend-row">
+          <span><span class="legend-dot" style="background:var(--stage-1)"></span>Cierre 2026: <b id="buyerLegend1">—</b></span>
+          <span><span class="legend-dot" style="background:var(--stage-2)"></span>Cierre 2027: <b id="buyerLegend2">—</b></span>
+          <span><span class="legend-dot" style="background:var(--stage-3)"></span>Cierre 2028: <b id="buyerLegend3">—</b></span>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -924,8 +965,10 @@
     return { arr, valuation, equityGross, equityNet, phantomGross, phantomNet, earnoutGross, earnoutNet, total };
   }
 
-  function renderStagedChart(totals){
-    const svg = $('stagedChart');
+  function renderStagedChart(totals, svgId, tooltipId){
+    svgId = svgId || 'stagedChart';
+    tooltipId = tooltipId || 'stagedTooltip';
+    const svg = $(svgId);
     svg.innerHTML = '';
     const W = 480, H = 360, padL = 36, padR = 20, padT = 34, padB = 34;
     const max = Math.max(...totals, 1);
@@ -950,7 +993,7 @@
     svg.appendChild(mk('line', {x1:padL, x2:W-padR, y1:y(0), y2:y(0), stroke:'var(--baseline)', 'stroke-width':1}));
 
     const shades = ['var(--stage-1)','var(--stage-2)','var(--stage-3)'];
-    const tooltip = $('stagedTooltip');
+    const tooltip = $(tooltipId);
     const labels = ['Etapa 1 · 26','Etapa 2 · 27','Etapa 3 · 28'];
 
     totals.forEach((val, i) => {
@@ -1043,6 +1086,46 @@
     $('stg_rowTotal').textContent = fmtMoney(grand,2);
 
     renderStagedChart([r1.total, r2.total, r3.total]);
+
+    // ---- Buyer-side view: cost of acquiring 100% of the company ----
+    const founderPct = eq1Pct + eq2Pct + eq3Pct + ph2Pct + ph3Pct;
+    const othersPct = Math.max(100 - founderPct, 0);
+
+    const val1 = mrr1 * 12 * mult1;
+    const val2 = mrr2 * 12 * mult1;
+    const val3 = mrr3 * 12 * mult1;
+
+    const buyerPct1 = eq1Pct + othersPct;
+    const buyerPct2 = eq2Pct + ph2Pct;
+    const buyerPct3 = eq3Pct + ph3Pct;
+
+    const earnout2Gross = earnoutTotalM * 1e6 * (eo2Pct/100);
+    const earnout3Gross = earnoutTotalM * 1e6 * (eo3Pct/100);
+
+    const buyerCost1 = val1 * (buyerPct1/100);
+    const buyerCost2 = val2 * (buyerPct2/100) + earnout2Gross;
+    const buyerCost3 = val3 * (buyerPct3/100) + earnout3Gross;
+    const buyerGrand = buyerCost1 + buyerCost2 + buyerCost3;
+
+    $('buyerOthersPctLabel').textContent = othersPct.toFixed(0) + '%';
+    $('buyerGrandTotal').textContent = fmtMoney(buyerGrand,2);
+    $('buyerPct1').textContent = buyerPct1.toFixed(0) + '%';
+    $('buyerPct2').textContent = buyerPct2.toFixed(0) + '%';
+    $('buyerPct3').textContent = buyerPct3.toFixed(0) + '%';
+    $('buyerTotal1').textContent = fmtMoney(buyerCost1,2);
+    $('buyerTotal2').textContent = fmtMoney(buyerCost2,2);
+    $('buyerTotal3').textContent = fmtMoney(buyerCost3,2);
+
+    const bar = $('buyerOwnershipBar');
+    bar.innerHTML =
+      `<div style="width:${buyerPct1}%; background:var(--stage-1);">${buyerPct1.toFixed(0)}%</div>` +
+      `<div style="width:${buyerPct2}%; background:var(--stage-2);">${buyerPct2.toFixed(0)}%</div>` +
+      `<div style="width:${buyerPct3}%; background:var(--stage-3);">${buyerPct3.toFixed(0)}%</div>`;
+    $('buyerLegend1').textContent = fmtMoney(buyerCost1,2);
+    $('buyerLegend2').textContent = fmtMoney(buyerCost2,2);
+    $('buyerLegend3').textContent = fmtMoney(buyerCost3,2);
+
+    renderStagedChart([buyerCost1, buyerCost2, buyerCost3], 'buyerChart', 'buyerTooltip');
   }
 
   Object.values(stInputs).forEach(el => {
